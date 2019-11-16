@@ -24,24 +24,30 @@ const InputForm: React.FC<InputProps> = (props) => {
     )
 }
 
+function useStateWithQuery(query: string, fallback: string = '') {
+    const urlParams = new URLSearchParams(window.location.search);
+    const defaultValue = urlParams.get(query) || fallback
+    return useState(defaultValue)
+}
+
 export const HostedPage: React.FC = () => {
-    const [locale, setLocale] = useState('en')
-    const [endpoint, setEndpoint] = useState("https://komoju.com")
-    const [merchant, setMerchant] = useState("")
-    const [secretKey, setSecretKey] = useState("")
-    const [externalOrderNumber, setExternalOrderNumber] = useState(crypto.lib.WordArray.random(16))
-    const [currency, setCurrency] = useState("JPY")
-    const [amount, setAmount] = useState("1000")
-    const [tax, setTax] = useState("0")
-    const [method, setMethod] = useState('credit_card')
-    const [subtype, setSubtype] = useState()
-    const [returnURL, setReturnURL] = useState(window.location.origin + '/return')
-    const [cancelURL, setCancelURL] = useState(window.location.origin + '/cancel')
-    const [email, setEmail] = useState("taro@degica.com")
-    const [phone, setPhone] = useState()
-    const [name, setName] = useState()
-    const [nameKana, setNameKana] = useState()
-    const [externalCustomerID, setExternalCustomerID] = useState()
+    const [locale, setLocale] = useStateWithQuery('locale', 'en')
+    const [endpoint, setEndpoint] = useStateWithQuery('endpoint', "https://komoju.com")
+    const [merchant, setMerchant] = useStateWithQuery('merchant', "")
+    const [secretKey, setSecretKey] = useStateWithQuery('secretKey', "")
+    const [externalOrderNumber, setExternalOrderNumber] = useStateWithQuery('externalOrderNumber', crypto.lib.WordArray.random(16))
+    const [currency, setCurrency] = useStateWithQuery('currency', "JPY")
+    const [amount, setAmount] = useStateWithQuery('amount', "1000")
+    const [tax, setTax] = useStateWithQuery('tax', "0")
+    const [method, setMethod] = useStateWithQuery('method', 'credit_card')
+    const [subtype, setSubtype] = useStateWithQuery('subtype')
+    const [returnURL, setReturnURL] = useStateWithQuery('returnURL', window.location.origin + '/return')
+    const [cancelURL, setCancelURL] = useStateWithQuery('cancelURL', window.location.origin + '/cancel')
+    const [email, setEmail] = useStateWithQuery('email', "taro@degica.com")
+    const [phone, setPhone] = useStateWithQuery('phone')
+    const [name, setName] = useStateWithQuery('name')
+    const [nameKana, setNameKana] = useStateWithQuery('nameKana')
+    const [externalCustomerID, setExternalCustomerID] = useStateWithQuery('externalCustomerID')
     const [destinations, setDestinations] = useState(settings.getDestinations())
 
     const buildLink = function (): string {
@@ -61,7 +67,7 @@ export const HostedPage: React.FC = () => {
             ['transaction[tax]', tax],
             ['transaction[subtype]', subtype]
         ].sort((a, b) => a[0] > b[0] ? 1 : -1)
-            .filter((x) => x[1] != undefined)
+            .filter((x) => x[1] && !(typeof x[1] == "string" && x[1].length == 0))
             .map((x) => { return encodeURIComponent(x[0]) + '=' + encodeURIComponent(x[1]) }).join('&')
         const path = '/' + locale + '/api/' + merchant + '/transactions/' + method + '/new?' + params
         const hash = hmac(path, secretKey)
@@ -124,11 +130,11 @@ export const HostedPage: React.FC = () => {
                 <Form.Group as={Row}>
                     <InputForm type="text" title="External Order #" value={externalOrderNumber} setValue={setExternalOrderNumber}></InputForm>
                     <InputForm as="select" title="Currency" value={currency} setValue={setCurrency}>
-                            <option>JPY</option>
-                            <option>KRW</option>
-                            <option>USD</option>
-                            <option>EUR</option>
-                            <option>TWD</option>
+                        <option>JPY</option>
+                        <option>KRW</option>
+                        <option>USD</option>
+                        <option>EUR</option>
+                        <option>TWD</option>
                     </InputForm>
                     <InputForm type="text" title="Amount" value={amount} setValue={setAmount}></InputForm>
                     <InputForm type="text" title="Tax" value={tax} setValue={setTax}></InputForm>
@@ -145,9 +151,9 @@ export const HostedPage: React.FC = () => {
                     <InputForm type="text" title="Name Kana" value={nameKana} setValue={setNameKana}></InputForm>
                     <InputForm type="text" title="External Customer ID" value={externalCustomerID} setValue={setExternalCustomerID}></InputForm>
                     <InputForm as="select" title="Locale" value={locale} setValue={setLocale}>
-                            <option>en</option>
-                            <option>ja</option>
-                            <option>ko</option>
+                        <option>en</option>
+                        <option>ja</option>
+                        <option>ko</option>
                     </InputForm>
                 </Form.Group>
             </Form>
