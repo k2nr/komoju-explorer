@@ -4,6 +4,26 @@ import hmac from 'crypto-js/hmac-sha256'
 import crypto from 'crypto-js'
 import * as settings from '../lib/settings'
 
+type InputProps = {
+    title: string,
+    value: string,
+    type?: string,
+    as?: 'input' | 'textarea' | 'select',
+    setValue: (x: any) => void
+}
+const InputForm: React.FC<InputProps> = (props) => {
+    return (
+        <>
+            <Form.Label column sm="3">{props.title}</Form.Label>
+            <Col sm="8">
+                <Form.Control type={props.type} as={props.as} value={props.value} onChange={(v: any) => { props.setValue(v.currentTarget.value) }}>
+                    {props.children}
+                </Form.Control>
+            </Col>
+        </>
+    )
+}
+
 export const HostedPage: React.FC = () => {
     const [locale, setLocale] = useState('en')
     const [endpoint, setEndpoint] = useState("https://komoju.com")
@@ -95,91 +115,40 @@ export const HostedPage: React.FC = () => {
                     </Col>
                 </Row>
                 <Form.Group as={Row}>
-                    <Form.Label column sm="3">Endpoint</Form.Label>
-                    <Col sm="8">
-                        <Form.Control type="text" defaultValue={endpoint} onChange={(v: any) => { setEndpoint(v.currentTarget.value) }}></Form.Control>
-                    </Col>
-                    <Form.Label column sm="3">Merchant UUID</Form.Label>
-                    <Col sm="8">
-                        <Form.Control type="text" defaultValue={merchant} onChange={(v: any) => { setMerchant(v.currentTarget.value) }}></Form.Control>
-                    </Col>
-                    <Form.Label column sm="3">Secret Key</Form.Label>
-                    <Col sm="8">
-                        <Form.Control type="text" defaultValue={secretKey} onChange={(v: any) => { setSecretKey(v.currentTarget.value) }}></Form.Control>
-                    </Col>
+                    <InputForm type="text" title="Endpoint" value={endpoint} setValue={setEndpoint}></InputForm>
+                    <InputForm type="text" title="Merchant UUID" value={merchant} setValue={setMerchant}></InputForm>
+                    <InputForm type="text" title="Secret Key" value={secretKey} setValue={setSecretKey}></InputForm>
                 </Form.Group>
 
                 <h3>Payment Info</h3>
                 <Form.Group as={Row}>
-                    <Form.Label column sm="3">External Order #</Form.Label>
-                    <Col sm="8">
-                        <Form.Control type="text" defaultValue={externalOrderNumber} onChange={(v: any) => { setExternalOrderNumber(v.currentTarget.value) }}></Form.Control>
-                    </Col>
-                    <Form.Label column sm="3">Currency</Form.Label>
-                    <Col sm="8">
-                        <Form.Control as="select" defaultValue="JPY" onChange={(v: any) => { setAmount(v.currentTarget.value) }}>
+                    <InputForm type="text" title="External Order #" value={externalOrderNumber} setValue={setExternalOrderNumber}></InputForm>
+                    <InputForm as="select" title="Currency" value={currency} setValue={setCurrency}>
                             <option>JPY</option>
                             <option>KRW</option>
                             <option>USD</option>
                             <option>EUR</option>
                             <option>TWD</option>
-                        </Form.Control>
-                    </Col>
-                    <Form.Label column sm="3">Amount</Form.Label>
-                    <Col sm="8">
-                        <Form.Control type="text" defaultValue="1000" onChange={(v: any) => { setAmount(v.currentTarget.value) }}></Form.Control>
-                    </Col>
-                    <Form.Label column sm="3">Tax</Form.Label>
-                    <Col sm="8">
-                        <Form.Control type="text" defaultValue="0" onChange={(v: any) => { setTax(v.currentTarget.value) }}></Form.Control>
-                    </Col>
-                    <Form.Label column sm="3">Method</Form.Label>
-                    <Col sm="8">
-                        <Form.Control type="text" defaultValue="credit_card" onChange={(v: any) => { setMethod(v.currentTarget.value) }}></Form.Control>
-                    </Col>
-                    <Form.Label column sm="3">Subtype</Form.Label>
-                    <Col sm="8">
-                        <Form.Control type="text" onChange={(v: any) => { setSubtype(v.currentTarget.value) }}></Form.Control>
-                    </Col>
-                    <Form.Label column sm="3">Return URL</Form.Label>
-                    <Col sm="8">
-                        <Form.Control type="text" defaultValue={returnURL} onChange={(v: any) => { setReturnURL(v.currentTarget.value) }}></Form.Control>
-                    </Col>
-                    <Form.Label column sm="3">Cancel URL</Form.Label>
-                    <Col sm="8">
-                        <Form.Control type="text" defaultValue={cancelURL} onChange={(v: any) => { setCancelURL(v.currentTarget.value) }}></Form.Control>
-                    </Col>
+                    </InputForm>
+                    <InputForm type="text" title="Amount" value={amount} setValue={setAmount}></InputForm>
+                    <InputForm type="text" title="Tax" value={tax} setValue={setTax}></InputForm>
+                    <InputForm type="text" title="Method" value={method} setValue={setMethod}></InputForm>
+                    <InputForm type="text" title="Subtype" value={subtype} setValue={setSubtype}></InputForm>
+                    <InputForm type="text" title="Return URL" value={returnURL} setValue={setReturnURL}></InputForm>
+                    <InputForm type="text" title="Cancel URL" value={cancelURL} setValue={setCancelURL}></InputForm>
                 </Form.Group>
                 <h3>Customer Info</h3>
                 <Form.Group as={Row}>
-                    <Form.Label column sm="3">E-mail</Form.Label>
-                    <Col sm="8">
-                        <Form.Control type="text" defaultValue={email} onChange={(v: any) => { setEmail(v.currentTarget.value) }}></Form.Control>
-                    </Col>
-                    <Form.Label column sm="3">Phone</Form.Label>
-                    <Col sm="8">
-                        <Form.Control type="text" onChange={(v: any) => { setPhone(v.currentTarget.value) }}></Form.Control>
-                    </Col>
-                    <Form.Label column sm="3">Name</Form.Label>
-                    <Col sm="8">
-                        <Form.Control type="text" defaultValue="Degica Taro" onChange={(v: any) => { setName(v.currentTarget.value) }}></Form.Control>
-                    </Col>
-                    <Form.Label column sm="3">Name Kana</Form.Label>
-                    <Col sm="8">
-                        <Form.Control type="text" onChange={(v: any) => { setNameKana(v.currentTarget.value) }}></Form.Control>
-                    </Col>
-                    <Form.Label column sm="3">External Customer ID</Form.Label>
-                    <Col sm="8">
-                        <Form.Control type="text" onChange={(v: any) => { setExternalCustomerID(v.currentTarget.value) }}></Form.Control>
-                    </Col>
-                    <Form.Label column sm="3">Locale</Form.Label>
-                    <Col sm="8">
-                        <Form.Control as="select" defaultValue="en" onChange={(v: any) => { setLocale(v.currentTarget.value) }}>
+                    <InputForm type="text" title="E-mail" value={email} setValue={setEmail}></InputForm>
+                    <InputForm type="text" title="Phone" value={phone} setValue={setPhone}></InputForm>
+                    <InputForm type="text" title="Name" value={name} setValue={setName}></InputForm>
+                    <InputForm type="text" title="Name Kana" value={nameKana} setValue={setNameKana}></InputForm>
+                    <InputForm type="text" title="External Customer ID" value={externalCustomerID} setValue={setExternalCustomerID}></InputForm>
+                    <InputForm as="select" title="Locale" value={locale} setValue={setLocale}>
                             <option>en</option>
                             <option>ja</option>
                             <option>ko</option>
-                        </Form.Control>
-                    </Col>
+                    </InputForm>
                 </Form.Group>
             </Form>
         </div>
